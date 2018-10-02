@@ -1,0 +1,16 @@
+{
+  "name": "tiny-app",
+  "version": "1.0.0",
+  "description": "this is my url shortener",
+  "main": "express_server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Mark Mckittrick",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3"
+  }
+}
