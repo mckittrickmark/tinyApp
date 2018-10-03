@@ -6,10 +6,16 @@
 
 </head>
 <body>
+  <% include partials/_header %>
   <%= urls.length %>
   <ul>
     <% for (var url in urls) { %>
-    <li> <%= url %> </li>
+    <form method="POST" action="/urls/<%= url%>/delete">
+      <li> <%= url %> - <%= urls[url] %></li>
+      <button name="Delete" type="submit" value="url">
+        Delete
+      </button>
+    </form>
     <% } %>
   </ul>
 </body>
