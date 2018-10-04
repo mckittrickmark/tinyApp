@@ -7,7 +7,6 @@
 </head>
 <body>
   <% include partials/_header %>
-  <%= urls.length %>
   <ul>
     <% for (var url in urls) { %>
     <form method="POST" action="/urls/<%= url%>/delete">
