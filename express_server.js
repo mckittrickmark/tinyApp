@@ -13,19 +13,44 @@ app.use(parseCookies())
 var numArray = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {shortURL: "b2xVn2",
+            longURL: "http://www.lighthouselabs.ca",
+            userID: "a12345"},
+  "9sm5xK": { shortURL: "9sm5xK",
+            longURL: "http://www.google.com",
+            userID: "a12345"}
 };
 
 // urlDatabase methods
 
 urlMethods = {
-  urlAll: () => {
-    return urlDatabase
+  urlAll: (user_id) => {
+    let tempUrlObj = {}
+    for (let url in urlDatabase) {
+      if (urlDatabase[url]['userID'] === user_id) {
+        tempUrlObj[url] = urlDatabase[url]
+        console.log(urlDatabase[url]['userID'], "???", user_id)
+      }
+    }
+    return tempUrlObj
   },
 //console.log(urlAll())
   urlLookup: (short) => {
-    return urlDatabase[short]
+    return urlDatabase[short]['longURL']
+  },
+  buildURL: (req, randString) => {
+    let tempURL = { shortURL: randString,
+                    longURL: req.body["longURL"],
+                    userID: req.cookies["user_id"]
+                    }
+    urlDatabase[randString] = tempURL
+  },
+  urlAllowed: (user_id, short) => {
+    if (urlDatabase[short]['userID'] === user_id) {
+      return true
+    } else {
+      return false
+    }
   }
 }
 //console.log(urlLookup("b2xVn2"))
@@ -96,13 +121,16 @@ userMethods = {
 //console.log(userMethods.userLookup("a12345"))
 //console.log(userMethods.checkPassword("a12345", "secret"))
 
-
+// this needs to be refactored
 app.post("/urls", (req, res) => {
-  let templateVar = generateRandomString()
-  urlDatabase[templateVar] = req.body.longURL
-  console.log(urlDatabase);  // debug statement to see POST parameters
-  console.log('Added shortURL: ' + templateVar + ' to: ' + req.body.longURL + ".");
-  res.redirect('/urls');
+  if (userMethods.userLookup(req.cookies.user_id).id) {
+    let randString = generateRandomString()
+    urlMethods.buildURL(req, randString)
+    console.log(urlDatabase);  // debug statement to see POST parameters
+    console.log('Added shortURL: ' + randString + ' to: ' + req.body.longURL + ".");
+    res.redirect('/urls');
+} else
+  res.redirect('/login');
 });
 
 
@@ -124,13 +152,15 @@ app.post("/register", (req, res) => {
     userMethods.addUser(userIdTemp, username, password)
     objectToPass.user = userMethods.userLookup(userIdTemp)
     res.cookie("user_id", userIdTemp)
-    res.render('register_response', validate);
+    res.render('register_response', objectToPass);
   } else {
-    validate.username = username
+    objectToPass.status_Code = validate.status_Code
+    objectToPass.message = validate.message
+    objectToPass.username = username
     res.render('register', objectToPass)
   }
 })
-
+// this needs to be refactored, also need to remove the delete operator and from the html form too
 app.post("/urls/:id/delete", (req, res) => {
   let id = req.params.id
   delete urlDatabase[id];
@@ -141,8 +171,8 @@ app.post("/login", (req, res) => {
   let objectToPass = buildObjectToPass()
 
   let validated = userMethods.checkLogin(req)
-  let username = req.body["username"]
-  let user_id = userMethods.userNametoId(username)
+  let username = req.body["username"] //might be redundant
+  let user_id = userMethods.userNametoId(username) //might be redundant
   if (validated === true) {
     console.log("passed")
     objectToPass.user = userMethods.userLookup(user_id)
@@ -159,11 +189,14 @@ app.post("/login", (req, res) => {
 })
 
 app.put("/urls/:shortURL", (req, res) => {
-  let short = req.params.shortURL
-  let newLong = req.body.longURL
-  urlDatabase[short] = newLong
-  console.log(urlDatabase)
-  res.redirect('/urls');
+  if (userMethods.userLookup(req.cookies.user_id).id) {
+    let short = req.params.shortURL
+    let newLong = req.body.longURL
+    urlDatabase[short]['longURL'] = newLong
+    res.redirect('/urls');
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 app.get("/register", (req, res) => {
@@ -183,22 +216,28 @@ app.get("/login", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let objectToPass = buildObjectToPass()
   objectToPass.user = userMethods.cookieToUser(req)
-
-  res.render("urls_new", objectToPass);
+  console.log(objectToPass.user['id'])
+  if (objectToPass.user['id']) {
+    res.render("urls_new", objectToPass);
+  } else {
+    res.redirect("/login")
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   let objectToPass = buildObjectToPass()
   objectToPass.user = userMethods.cookieToUser(req)
-
   objectToPass.short = req.params.shortURL
-  objectToPass.long = urlDatabase[req.params.shortURL]
-  console.log(objectToPass)
-  res.render("urls_show", objectToPass);
+  objectToPass.long = urlMethods.urlLookup(objectToPass.short)
+  if (urlMethods.urlAllowed(objectToPass.user.id, objectToPass.short)) {
+    res.render("urls_show", objectToPass);
+  } else {
+      res.redirect("/urls")
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL]
+  let longURL = urlMethods.urlLookup(req.params.shortURL)
   console.log(longURL)
   res.redirect(longURL);
 });
@@ -206,9 +245,14 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls", (req, res) => {
   var objectToPass = buildObjectToPass()
   objectToPass.user = userMethods.cookieToUser(req)
-
-  objectToPass.urls = urlDatabase
-  res.render("urls_index", objectToPass);
+  if (objectToPass.user['id']) {
+    console.log(objectToPass.user['id'])
+    objectToPass.urls = urlMethods.urlAll(objectToPass.user['id'])
+    console.log(objectToPass.urls)
+    res.render("urls_index", objectToPass);
+  } else {
+      res.redirect("/login")
+  }
 });
 
 app.get("/hello", (req, res) => {
@@ -216,17 +260,9 @@ app.get("/hello", (req, res) => {
 });
 
 
-
-
-
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-
 
 
 function generateRandomString() {

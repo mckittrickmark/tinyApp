@@ -8,9 +8,9 @@
 <body>
   <% include partials/_header %>
   <ul>
-    <% for (var url in urls) { %>
-    <form method="POST" action="/urls/<%= url%>/delete">
-      <li> <%= url %> - <%= urls[url] %></li>
+    <% for (url in urls) { %>
+    <form action="/urls/<%= url%>/delete?_method=POST" method="POST" >
+      <li> <%= url %> - <%= urls[url]["longURL"] %></li>
       <button name="Delete" type="submit" value="url">
         Delete
       </button>
