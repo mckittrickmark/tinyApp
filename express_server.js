@@ -4,6 +4,10 @@ var PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const methodOverride = require('method-override')
 const parseCookies = require('cookie-parser')
+const bcrypt = require('bcryptjs')
+
+const saltRounds = 12
+
 
 app.set('view engine', 'ejs');
 app.use(methodOverride('_method'))
@@ -59,7 +63,7 @@ const users = {
   a12345: {
     id: "a12345",
     username: "spaghetti@slime.com",
-    password: "secret"
+    password: "$2a$12$4uFKm24/7ufc1A0/u7BfrujHjMrqJZBhhmDc68CssPnWX8s4AvfWK"
   }
 }
 
@@ -71,10 +75,11 @@ userMethods = {
     return users[id]
   },
   addUser: (id, username, password) => {
+    let passwordcrypt = passwordHasher(password)
     users[id] = {
       id: id,
       username: username,
-      password: password
+      password: passwordcrypt
     }
   },
   cookieToUser: (req) => {
@@ -99,9 +104,10 @@ userMethods = {
   },
   // if you pass an invalid user_id to checkPassword it crashes the program ... change that or make sure it doesn't happen
   checkPassword: (user_id, inputPassword) => {
+    let passcrypt = passwordHasher(inputPassword)
     let user = userMethods.userLookup(user_id)
     console.log(user)
-    if (user["password"] === inputPassword) {
+    if (user["password"] === passcrypt) {
       return true
     } else {
       return false
@@ -117,11 +123,7 @@ userMethods = {
     return userMethods.checkPassword(user_id, password)
   }
 }
-//console.log(userMethods.checkLogin({body:{id: username: "spaghetti@slime.com", password: "secret"}}))
-//console.log(userMethods.userLookup("a12345"))
-//console.log(userMethods.checkPassword("a12345", "secret"))
 
-// this needs to be refactored
 app.post("/urls", (req, res) => {
   if (userMethods.userLookup(req.cookies.user_id).id) {
     let randString = generateRandomString()
@@ -299,6 +301,13 @@ function checkEmail(email) {
     return emailCheckResponse
   }
 }
+
+function passwordHasher (plaintext) {
+  let passcrypt = bcrypt.hashSync(plaintext, saltRounds)
+  return passcrypt
+}
+
+console.log(passwordHasher("a12345"))
 
 function buildObjectToPass () {
   //empty object to contain all possible strings/objects
