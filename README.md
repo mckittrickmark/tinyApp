@@ -5,8 +5,8 @@ TinyApp is a full stack web development application built with Node and Express 
 ## Final Product
 Registration Page
 !["Screenshot of Registration"](https://github.com/mckittrickmark/tinyApp/blob/master/pictures/Screen%20Shot%202018-10-05%20at%204.27.27%20PM.png)
-
-!["Screenshot of URL List"](https://github.com/mckittrickmark/tinyApp/blob/master/pictures/Screen%20Shot%202018-10-05%20at%204.29.36%20PM.png)
+List of URLs
+!["Screenshot of URL List"](https://github.com/mckittrickmark/tinyApp/blob/master/pictures/Screen%20Shot%202018-10-05%20at%204.36.04%20PM.png)
 
 
 
