@@ -1,18 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TinyApp</title>
-
+  <title>TinyApp Spaghetti</title>
 </head>
+<header>
+</header>
 <body>
-  <p> This is TinyApp </p>
-  <% if (user['username']) { %>
-    <p> <%= user['username'] %> </p>
-    <form action="/logout" method="POST" style="margin:150px">
-      <button name="Logout" type="submit" value="url">
-        Logout
-      </button>
-    </form>
-  <% } %>
+  <div clas="container">
+
+    <div class="row">
+
+      <div class="col-lg-2">
+        <p>Tiny App</p>
+      </div>
+
+      <div class="col-lg-2">
+        <a href="/home">Home</a>
+      </div>
+
+      <div class="col-lg-2">
+        <a href="/urls">URLs</a>
+      </div>
+
+      <div class="col-lg-2">
+        <a href="/urls/new">New Short URL</a>
+      </div>
+
+      <% if (!user.username) { %>
+      <div class="col-lg-2">
+        <a href="/register" >Register</a>
+      </div>
+
+      <div class="col-lg-2">
+        <a href="/login" >Login</a>
+      </div>
+
+      <% } %>
+    </div>
+    <div class="row">
+
+      <% if (user.username) { %>
+      <div class="col-lg-2">
+        <%= user.username %>
+      </div>
+
+      <div class="col-lg-2">
+        <form action="/logout" method="POST">
+        <button name="Logout" type="submit" value="url">
+          Logout
+        </button>
+        </form>
+      </div>
+
+      <% } %>
+    </div>
+
+  </div>
 </body>
 </html>

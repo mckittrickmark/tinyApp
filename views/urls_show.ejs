@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><title>TinyApp</title></head>
+  <head>
+    <title>TinyApp</title>
+    <% include partials/head %>
+  </head>
   <body style="font-size:20px; padding:50px;">
      <% include partials/_header %>
      <div>
-      <%= short %> -- <%= long %>
+      <p>localhost:8080/<%= short %> -- <%= long %></p>
+      <ul>
+        <li><p> Visits: <%= url['visitCount'] %> </p> </li>
+        <li><p> Unique Visitors: <%= url['uniqueCount'] %> </p></li>
+        <li><p> Date Created: <%= url['dateCreated'] %> </p></li>
       <form action="/urls/<%= short %>?_method=PUT" method="POST" style="margin:150px;">
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Update">

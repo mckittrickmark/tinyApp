@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head></head>
+  <head><% include partials/head %></head>
   <body style="font-size:20px; padding:50px;">
     <% include partials/_header %>
-    <form action="/login" method="POST" style="margin:150px;">
-      <label for="username">Enter an email:</label>
-      <input id="username" type=email name="username" placeholder="email@example.com" style="width: 300px">
-      <label for="password">Enter a Password:</label>
-      <input id="password" type=password name="password" placeholder="Put your password here" style="width: 300px">
-      <input type="submit" value="Submit">
-      <p><% if (status_Code === "403") { %> <%= message %> <% } %> </p>
-    </form>
-    <a href="/register"> Register </a>
+    <div class="container-fluid">
+
+      <div class="row">
+        <div class="col-lg-8">
+          <p style = "font-size:20px" class="text-left">Login Page</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <form action="/login" method="POST" style="margin:150px;">
+            <label for="username">Enter an Email:</label>
+              <input id="username" type=email name="username" placeholder="email@example.com" style="width: 300px">
+            <label for="password">Enter a Password:</label>
+            <input id="password" type=password name="password" placeholder="Put your password here" style="width:      300px">
+            <input type="submit" value="Submit">
+          </form>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-2">
+        </div>
+        <div class="col-lg-8">
+          <p><% if (status_Code === "403") { %> <%= message %> <% } %> </p>
+        </div>
+        <div class="col-lg-2">
+        </div>
+      </div>
+
+    </div>
   </body>
 </html>

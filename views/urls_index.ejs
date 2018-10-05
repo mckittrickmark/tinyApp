@@ -2,20 +2,61 @@
 <html lang="en">
 <head>
   <title>TinyApp</title>
-
-
+  <% include partials/head %>
 </head>
+<header>
+
+</header>
 <body>
   <% include partials/_header %>
-  <ul>
-    <% for (url in urls) { %>
-    <form action="/urls/<%= url%>/delete?_method=POST" method="POST" >
-      <li> <%= url %> - <%= urls[url]["longURL"] %></li>
-      <button name="Delete" type="submit" value="url">
-        Delete
-      </button>
-    </form>
-    <% } %>
-  </ul>
+  <% let i = 0 %>
+  <div class="container-fluid">
+    <div class="row" >
+      <div class="col-lg-12">
+        <p style = "font-size:20px" class="text-lg-left">Login Page</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-3">
+      </div>
+
+      <div class="col-lg-6">
+        <% for (url in urls) { %>
+        <form action="/urls/<%= url%>/delete?_method=DELETE" method="POST" >
+          localhost:8080/u/<%= url %> - <%= urls[url]["longURL"] %>
+          <button name="Delete" type="submit" value="url">
+            Delete
+          </button>
+        </form>
+        <form action="/urls/<%= url%>" method="GET" >
+          <button name="Update" type="submit" value="update">
+            Edit
+          </button>
+          <p> Visits: <%= urls[url]['visitCount'] %> </p>
+          <p> Unique Visitors: <%= urls[url]['uniqueCount'] %> </p>
+          <% i += 1 %>
+          <p> Date Created: <%= urls[url]['dateCreated'] %> </p>
+          <% } %>
+          <div class="col-lg-2">
+            <a href="/urls/new">New Short URL</a>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-lg-3">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-3">
+      </div>
+
+      <div class="col-lg-6">
+        <% if (i < 1) { %>
+        <div> No URLs currently added. Navigate to New URL in the header to make some URLs! </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
