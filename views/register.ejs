@@ -3,6 +3,7 @@
   <head><% include partials/head %></head>
   <body style="font-size:20px; padding:50px;">
     <% include partials/_header %>
+    <p> Registration Page </p>
     <% if (status_Code === "400") { %>
       <p> "<%= username %>" is not a valid username/email. Please try another. </p>
       <p> <%= message %>. </p>
